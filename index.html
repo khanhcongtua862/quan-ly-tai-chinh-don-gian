@@ -24,73 +24,8 @@
     <!-- Nút xuất file -->
     <button onclick="exportToJson()">Xuất JSON</button>
     <button onclick="exportToCsv()">Xuất CSV</button>
+    <button onclick="clearAllTransactions()">Xóa lịch sử giao dịch</button>
+    <script src="./js/script.js"></script>
 
-    <script>
-        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-
-        document.addEventListener('DOMContentLoaded', function () {
-            updateUI(); // Load dữ liệu khi trang tải
-        });
-
-        function addTransaction() {
-            const desc = document.getElementById('desc').value;
-            const amount = parseFloat(document.getElementById('amount').value);
-            const type = document.getElementById('type').value;
-
-            if (!desc || isNaN(amount)) return alert('Vui lòng nhập đầy đủ thông tin');
-
-            transactions.push({ desc, amount, type });
-            updateUI();
-            document.getElementById('desc').value = '';
-            document.getElementById('amount').value = '';
-
-            localStorage.setItem('transactions', JSON.stringify(transactions));
-        }
-
-        function updateUI() {
-            const transactionList = document.getElementById('transactions');
-            transactionList.innerHTML = ''; // Xóa danh sách cũ trước khi cập nhật
-
-            transactions.forEach(transaction => {
-                const li = document.createElement('li');
-                li.textContent = `${transaction.desc} - ${transaction.amount} VND (${transaction.type === 'income' ? 'Thu' : 'Chi'})`;
-                transactionList.appendChild(li);
-            });
-
-            // Cập nhật tổng số dư
-            const balance = transactions.reduce((acc, transaction) => {
-                return transaction.type === 'income' ? acc + transaction.amount : acc - transaction.amount;
-            }, 0);
-            document.getElementById('balance').textContent = balance + ' VND';
-
-            localStorage.setItem('transactions', JSON.stringify(transactions));
-        }
-
-        function exportToJson() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transactions, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "transactions.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            document.body.removeChild(downloadAnchor);
-        }
-
-        function exportToCsv() {
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Mô tả,Số tiền,Loại\n"; // Tiêu đề cột
-            transactions.forEach(({ desc, amount, type }) => {
-                csvContent += `${desc},${amount},${type === 'income' ? 'Thu' : 'Chi'}\n`;
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", encodedUri);
-            downloadAnchor.setAttribute("download", "transactions.csv");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            document.body.removeChild(downloadAnchor);
-        }
-    </script>
 </body>
 </html>
